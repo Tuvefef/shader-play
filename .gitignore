@@ -1,0 +1,13 @@
+# binary files
+shader
+
+# include directories
+include/cgm
+include/glad
+include/KHR
+
+# source files
+src/usp/glad.c
+
+# vscode settings
+.vscode/
