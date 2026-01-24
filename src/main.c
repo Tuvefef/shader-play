@@ -1,3 +1,6 @@
+#include <stdio.h>
+#include <stdlib.h>
+
 #include <glad/glad.h>
 #include <GLFW/glfw3.h>
 #include <cgm/cgm.h>
@@ -6,19 +9,35 @@
 
 int main()
 {
-    if (!glfwInit()) 
-    {
-        printf("failed to init glfw\n");
-        return 1;
-    }
-
+    glfwInit();
     glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, 3);
     glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 3);
     glfwWindowHint(GLFW_OPENGL_PROFILE, GLFW_OPENGL_CORE_PROFILE);
 
     ShaderWindow sw = sCreateWindow(gmVec2(400, 400), "shader play");
+    ShaderProgram sp = sCreateShaderProgram("shaders/core.vert", "shaders/core.frag");
 
-    sMainLoop(gmVec4(0.2f, 0.3f, 0.4f, 1.0f), &sw);
+    unsigned int gVertexArrayObject;
+
+    glGenVertexArrays(1, &gVertexArrayObject);
+    glBindVertexArray(gVertexArrayObject);
+
+    while (!glfwWindowShouldClose(sw.window))
+    {
+        glClearColor(0.2f, 0.3f, 0.4f, 1.0f);
+        glClear(GL_COLOR_BUFFER_BIT);
+
+        glUseProgram(sp.gShaderProgram);
+        glBindVertexArray(gVertexArrayObject);
+        glDrawArrays(GL_TRIANGLES, 0, 3);
+        GLERR();
+
+        glfwSwapBuffers(sw.window);
+        glfwPollEvents();
+    }
+
+    glDeleteVertexArrays(1, &gVertexArrayObject);
+    sDeleteShaderProgram(&sp);
 
     sDestroyWindow(&sw);
     glfwTerminate();

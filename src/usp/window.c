@@ -1,28 +1,28 @@
 #include "../include/shaderplay/shaderplay.h"
 
-void sFramebufferSizeCallBack(GLFWwindow* sWindow, int w, int h)
+void sFramebufferSizeCallBack(GLFWwindow *window, int w, int h)
 {
-    (void)sWindow;
+    (void)window;
     glViewport(0, 0, w, h);
 }
 
-ShaderWindow sCreateWindow(vec2 windowSize, const char* windowName)
+ShaderWindow sCreateWindow(vec2 windowSize, const char *windowName)
 {
     ShaderWindow gWindow = {
         .w = (int)windowSize.x,
         .h = (int)windowSize.y
     };
 
-    gWindow.gw = glfwCreateWindow(gWindow.w, gWindow.h, windowName, NULL, NULL);
+    gWindow.window = glfwCreateWindow(gWindow.w, gWindow.h, windowName, NULL, NULL);
 
-    if (!gWindow.gw)
+    if (!gWindow.window)
     {
         printf("failed to create window!\n");
         glfwTerminate();
         return SWNULL;
     }
 
-    glfwMakeContextCurrent(gWindow.gw);
+    glfwMakeContextCurrent(gWindow.window);
 
     if (!gladLoadGLLoader((GLADloadproc)glfwGetProcAddress))
     {
@@ -30,26 +30,15 @@ ShaderWindow sCreateWindow(vec2 windowSize, const char* windowName)
         return SWNULL;
     }
 
-    glfwSetFramebufferSizeCallback(gWindow.gw, sFramebufferSizeCallBack);
+    glfwSetFramebufferSizeCallback(gWindow.window, sFramebufferSizeCallBack);
 
     return gWindow;
 }
 
-void sMainLoop(vec4 windowColor, ShaderWindow* gw)
+void sDestroyWindow(ShaderWindow *gw)
 {
-    while (!glfwWindowShouldClose(gw->gw))
+    if (gw && gw->window)
     {
-        glClearColor(windowColor.x, windowColor.y, windowColor.z, windowColor.w);
-        glClear(GL_COLOR_BUFFER_BIT);
-        glfwSwapBuffers(gw->gw);
-        glfwPollEvents();
-    }
-}
-
-void sDestroyWindow(ShaderWindow* gw)
-{
-    if (gw && gw->gw)
-    {
-        glfwDestroyWindow(gw->gw);
+        glfwDestroyWindow(gw->window);
     }
 }
