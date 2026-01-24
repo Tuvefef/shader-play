@@ -19,7 +19,7 @@ ShaderWindow sCreateWindow(vec2 windowSize, const char *windowName)
     {
         printf("failed to create window!\n");
         glfwTerminate();
-        return SWNULL;
+        return VOIDSTRC(ShaderWindow);
     }
 
     glfwMakeContextCurrent(gWindow.window);
@@ -27,7 +27,7 @@ ShaderWindow sCreateWindow(vec2 windowSize, const char *windowName)
     if (!gladLoadGLLoader((GLADloadproc)glfwGetProcAddress))
     {
         printf("failed to load GL!\n");
-        return SWNULL;
+        return VOIDSTRC(ShaderWindow);
     }
 
     glfwSetFramebufferSizeCallback(gWindow.window, sFramebufferSizeCallBack);

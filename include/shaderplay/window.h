@@ -7,17 +7,16 @@
 #include <GLFW/glfw3.h>
 #include <cgm/cgm.h>
 
-#define SWNULL (ShaderWindow){0}
+#define VOIDSTRC(x) ((x){0})
 
 typedef struct 
 {
     int w;
     int h;
-    GLFWwindow* window;
+    GLFWwindow *window;
 } ShaderWindow;
 
-ShaderWindow sCreateWindow(vec2 windowSize, const char* windowName);
-
+ShaderWindow sCreateWindow(vec2 windowSize, const char *windowName);
 void sDestroyWindow(ShaderWindow *gw);
 
 #endif

@@ -6,16 +6,20 @@
 
 #include <glad/glad.h>
 
-#define GLERR()                                      \
-    do {                                                \
-        unsigned int err;                                     \
-        while ((err = glGetError()) != GL_NO_ERROR)     \
-            printf("[GL ERR] 0x%x\n", err);           \
-    } while (0)
+#define VOIDSTRC(x) ((x){0})
+
+typedef struct
+{
+    char *shaderData;
+    size_t shaderSize;
+    const char *shaderPath;
+} ShaderSource;
 
 typedef struct
 {
     unsigned int gShaderProgram;
+    ShaderSource gVertexShaderSource;
+    ShaderSource gFragmentShaderSource;
 } ShaderProgram;
 
 ShaderProgram sCreateShaderProgram(const char *vertexSource, const char *fragmentsource);
