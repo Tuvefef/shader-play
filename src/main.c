@@ -22,6 +22,8 @@ int main()
     glGenVertexArrays(1, &gVertexArrayObject);
     glBindVertexArray(gVertexArrayObject);
 
+    glfwSetWindowUserPointer(sw.window, &sp);
+
     while (!glfwWindowShouldClose(sw.window))
     {
         glClearColor(0.0f, 0.0f, 0.0f, 1.0f);

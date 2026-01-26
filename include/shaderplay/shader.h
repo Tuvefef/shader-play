@@ -20,9 +20,14 @@ typedef struct
     unsigned int gShaderProgram;
     ShaderSource gVertexShaderSource;
     ShaderSource gFragmentShaderSource;
+
+    const char *gVertexShaderPath;
+    const char *gFragmentShaderPath;
 } ShaderProgram;
 
 ShaderProgram sCreateShaderProgram(const char *vertexSource, const char *fragmentsource);
-void sDeleteShaderProgram(ShaderProgram *gs);
+
+void sReloadShaderProgram(ShaderProgram *s);
+void sDeleteShaderProgram(ShaderProgram *s);
 
 #endif

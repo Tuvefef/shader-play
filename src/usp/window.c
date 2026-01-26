@@ -1,9 +1,24 @@
 #include "../include/shaderplay/shaderplay.h"
 
-void sFramebufferSizeCallBack(GLFWwindow *window, int w, int h)
+static void sFramebufferSizeCallBack(GLFWwindow *window, int w, int h)
 {
     (void)window;
     glViewport(0, 0, w, h);
+}
+
+static void sKeyCallBack(GLFWwindow *window, int k, int s, int a, int m)
+{
+    (void)m;
+    (void)s;
+
+    if (k == GLFW_KEY_R && a == GLFW_PRESS)
+    {
+        ShaderProgram *shader = glfwGetWindowUserPointer(window);
+        if (shader)
+        {
+            sReloadShaderProgram(shader);
+        }
+    }
 }
 
 ShaderWindow sCreateWindow(vec2 windowSize, const char *windowName)
@@ -17,7 +32,7 @@ ShaderWindow sCreateWindow(vec2 windowSize, const char *windowName)
 
     if (!gWindow.window)
     {
-        printf("failed to create window!\n");
+        fprintf(stderr, "failed to create window!\n");
         glfwTerminate();
         return VOIDSTRC(ShaderWindow);
     }
@@ -26,19 +41,17 @@ ShaderWindow sCreateWindow(vec2 windowSize, const char *windowName)
 
     if (!gladLoadGLLoader((GLADloadproc)glfwGetProcAddress))
     {
-        printf("failed to load GL!\n");
+        fprintf(stderr, "failed to load GL!\n");
         return VOIDSTRC(ShaderWindow);
     }
 
     glfwSetFramebufferSizeCallback(gWindow.window, sFramebufferSizeCallBack);
+    glfwSetKeyCallback(gWindow.window, sKeyCallBack);
 
     return gWindow;
 }
 
 void sDestroyWindow(ShaderWindow *gw)
 {
-    if (gw && gw->window)
-    {
-        glfwDestroyWindow(gw->window);
-    }
+    glfwDestroyWindow(gw->window);
 }
