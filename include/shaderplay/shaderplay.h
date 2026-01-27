@@ -4,5 +4,6 @@
 #include "debug.h"
 #include "window.h"
 #include "shader.h"
+#include "uniform.h"
 
 #endif

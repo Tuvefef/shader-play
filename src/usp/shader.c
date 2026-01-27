@@ -82,15 +82,18 @@ void sReloadShaderProgram(ShaderProgram *s)
         return;
     }
 
+    unsigned int oldProgram = s->gShaderProgram;
     ShaderProgram n = sCreateShaderProgram(s->gVertexShaderPath, s->gFragmentShaderPath);
+    
     if (!n.gShaderProgram)
     {
-        GLOG("error when reloading shader");
-    } else {
-        glDeleteProgram(s->gShaderProgram);
-        *s = n;
-        printf("shader reload!\n");
+        GLOG("error when reloading shader - keeping old program");
+        return;
     }
+    
+    glDeleteProgram(oldProgram);
+    *s = n;
+    printf("shader reload successful!\n");
 }
 
 void sDeleteShaderProgram(ShaderProgram *s)

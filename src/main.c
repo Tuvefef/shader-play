@@ -31,6 +31,10 @@ int main()
 
         glUseProgram(sp.gShaderProgram);
         GERR();
+        
+        Uniform uVec3ColorLoc = gCreateUniform(sp, "gColor");
+        gUniformVec3(&uVec3ColorLoc, gmVec3(0.6f, 0.8f, 1.0f));
+        GERR();
 
         glBindVertexArray(gVertexArrayObject);
         GERR();
