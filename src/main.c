@@ -30,9 +30,13 @@ int main()
         glClear(GL_COLOR_BUFFER_BIT);
 
         glUseProgram(sp.gShaderProgram);
+        GERR();
+
         glBindVertexArray(gVertexArrayObject);
+        GERR();
+
         glDrawArrays(GL_TRIANGLES, 0, 3);
-        GLERR();
+        GERR();
 
         glfwSwapBuffers(sw.window);
         glfwPollEvents();

@@ -32,7 +32,7 @@ ShaderWindow sCreateWindow(vec2 windowSize, const char *windowName)
 
     if (!gWindow.window)
     {
-        fprintf(stderr, "failed to create window!\n");
+        GLOG("failed to create window");
         glfwTerminate();
         return VOIDSTRC(ShaderWindow);
     }
@@ -41,7 +41,7 @@ ShaderWindow sCreateWindow(vec2 windowSize, const char *windowName)
 
     if (!gladLoadGLLoader((GLADloadproc)glfwGetProcAddress))
     {
-        fprintf(stderr, "failed to load GL!\n");
+        GLOG("failed to load GL");
         return VOIDSTRC(ShaderWindow);
     }
 

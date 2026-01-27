@@ -1,4 +1,5 @@
 #include "../include/shaderplay/shader.h"
+#include "../include/shaderplay/debug.h"
 
 static ShaderSource sReadShader(const char *shaderPath)
 {
@@ -25,23 +26,11 @@ static ShaderSource sReadShader(const char *shaderPath)
     return src;
 }
 
-static void sCheckShaderCompile(unsigned int shader, const char *name)
-{
-    int shaderSuccess;
-    char shaderLog[1024];
-
-    glGetShaderiv(shader, GL_COMPILE_STATUS, &shaderSuccess);
-    if (!shaderSuccess)
-    {
-        glGetShaderInfoLog(shader, 1024, NULL, shaderLog);
-        fprintf(stderr, "[SHADER COMPILE ERROR] %s\n%s\n", name, shaderLog);
-    }
-}
-
 static void sDeleteShaderSource(ShaderSource *src)
 {
     free(src->shaderData);
     src->shaderData = NULL;
+    src->shaderSize = 0;
 }
 
 ShaderProgram sCreateShaderProgram(const char *vertexSource, const char *fragmentSource)
@@ -64,12 +53,17 @@ ShaderProgram sCreateShaderProgram(const char *vertexSource, const char *fragmen
     glCompileShader(gVertexShader);
     glCompileShader(gFragmentShader);
 
-    sCheckShaderCompile(gVertexShader, ":vertex:");
-    sCheckShaderCompile(gFragmentShader, ":fragment:");
+    gCheckShaderCompile(gVertexShader, ":vertex:");
+    GERR();
+
+    gCheckShaderCompile(gFragmentShader, ":fragment:");
+    GERR();
 
     glAttachShader(gShader.gShaderProgram, gVertexShader);
     glAttachShader(gShader.gShaderProgram, gFragmentShader);
     glLinkProgram(gShader.gShaderProgram);
+    GCHECK_PROGRAM(gShader.gShaderProgram, "main");
+    GERR();
 
     sDeleteShaderSource(&gShader.gVertexShaderSource);
     sDeleteShaderSource(&gShader.gFragmentShaderSource);
@@ -82,10 +76,16 @@ ShaderProgram sCreateShaderProgram(const char *vertexSource, const char *fragmen
 
 void sReloadShaderProgram(ShaderProgram *s)
 {
+    if (!s || !s->gShaderProgram)
+    {
+        GLOG("invalid shader program pointer");
+        return;
+    }
+
     ShaderProgram n = sCreateShaderProgram(s->gVertexShaderPath, s->gFragmentShaderPath);
     if (!n.gShaderProgram)
     {
-        fprintf(stderr, "error when reloading shader!\n");
+        GLOG("error when reloading shader");
     } else {
         glDeleteProgram(s->gShaderProgram);
         *s = n;
