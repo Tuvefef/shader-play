@@ -17,11 +17,15 @@ int main()
     ShaderWindow sw = sCreateWindow(gmVec2(400, 400), "shader play");
     ShaderProgram sp = sCreateShaderProgram("shaders/core.vert", "shaders/core.frag");
 
+    gCacheUniforms(&sp);
+
     unsigned int gVertexArrayObject;
 
     glGenVertexArrays(1, &gVertexArrayObject);
     glBindVertexArray(gVertexArrayObject);
 
+    int w, h;
+    glfwGetFramebufferSize(sw.window, &w, &h);
     glfwSetWindowUserPointer(sw.window, &sp);
 
     while (!glfwWindowShouldClose(sw.window))
@@ -32,8 +36,13 @@ int main()
         glUseProgram(sp.gShaderProgram);
         GERR();
         
-        Uniform uVec3ColorLoc = gCreateUniform(sp, "gColor");
-        gUniformVec3(&uVec3ColorLoc, gmVec3(0.6f, 0.8f, 1.0f));
+        gUniformVec3(&sp.u.gColorLoc, gmVec3(0.6f, 0.8f, 1.0f));
+        GERR();
+
+        gUniformVec2(&sp.u.gResolutionLoc, gmVec2((float)w, (float)h));
+        GERR();
+
+        gUniformFloat(&sp.u.gTimeLoc, (float)glfwGetTime());
         GERR();
 
         glBindVertexArray(gVertexArrayObject);

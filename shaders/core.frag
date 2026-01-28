@@ -1,20 +1,22 @@
 #version 330 core
 
-out vec4 FragColor;
-
+uniform vec2 gResolution;
 uniform vec3 gColor;
+uniform float gTime;
 
-#define SET_COLOR 0.0
-
-vec3 gcolor()
-{
-    vec3 v00 = vec3(0.0, 1.0, 0.0);
-    vec3 v11 = vec3(0.16, 0.45, 0.53);
-
-    return mix(gColor, v11, SET_COLOR);
-}
+in vec2 gTexCoord;
+out vec4 FragColor;
 
 void main()
 {
-    FragColor = vec4(gcolor(), 1.0);
+    vec2 uv = gTexCoord * 2.0 - 1.0;
+    uv.x *= gResolution.x / gResolution.y;
+
+    float wave = sin(uv.x * 4.0 + gTime) * 0.1;
+    uv.y += wave;
+
+    float t = 0.5 + 0.5 * sin(gTime + length(uv) * 4.0);
+    vec3 col = mix(gColor, vec3(uv * 0.5 + 0.5, 0.5), t);
+
+    FragColor = vec4(col, 1.0);
 }

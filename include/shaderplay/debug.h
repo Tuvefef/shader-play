@@ -17,8 +17,11 @@ static inline const char *gErrStr(GLenum err)
     }
 }
 
-#define GLOG(fmt, ...) \
+#define GLOG(fmt, ...)                                  \
     fprintf(stderr, "[LOG] " fmt "\n", ##__VA_ARGS__)
+
+#define GWARN(fmt, ...)                                 \
+    printf("[WARN] " fmt "\n", ##__VA_ARGS__)
 
 #define GERR() do {                                                                                         \
     GLenum err;                                                                                             \

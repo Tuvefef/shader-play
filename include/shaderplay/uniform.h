@@ -2,7 +2,6 @@
 #define UNIFORM_H
 
 #include <cgm/cgm.h>
-#include "shader.h"
 
 typedef struct
 {
@@ -10,13 +9,19 @@ typedef struct
     int uloc;
 } Uniform;
 
-/**
- * @brief create the uniform location
- * @return Uniform 
- * @note It only has to be called after calling the program inside the loop
- */
-Uniform gCreateUniform(ShaderProgram s, const char *uname);
+typedef struct
+{
+    Uniform gColorLoc;
+    Uniform gResolutionLoc;
+    Uniform gTimeLoc;
+} ShaderUniform;
+
+typedef struct ShaderProgram ShaderProgram;
+
+Uniform gCreateUniform(ShaderProgram *s, const char *uname);
 
 void gUniformVec3(Uniform *uptr, vec3 v);
+void gUniformVec2(Uniform *uptr, vec2 v);
+void gUniformFloat(Uniform *uptr, float f);
 
 #endif

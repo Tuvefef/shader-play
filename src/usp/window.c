@@ -1,9 +1,20 @@
-#include "../include/shaderplay/shaderplay.h"
+#include "../include/shaderplay/uniform.h"
+#include "../include/shaderplay/shader.h"
+#include "../include/shaderplay/debug.h"
+#include "../include/shaderplay/window.h"
 
 static void sFramebufferSizeCallBack(GLFWwindow *window, int w, int h)
 {
-    (void)window;
     glViewport(0, 0, w, h);
+
+    ShaderProgram *s = glfwGetWindowUserPointer(window);
+    if(s)
+    {
+        glUseProgram(s->gShaderProgram);
+        GERR();
+
+        gUniformVec2(&s->u.gResolutionLoc, gmVec2((float)w, (float)h));
+    }
 }
 
 static void sKeyCallBack(GLFWwindow *window, int k, int s, int a, int m)
@@ -44,6 +55,10 @@ ShaderWindow sCreateWindow(vec2 windowSize, const char *windowName)
         GLOG("failed to load GL");
         return VOIDSTRC(ShaderWindow);
     }
+
+    int fbw, fbh;
+    glfwGetFramebufferSize(gWindow.window, &fbw, &fbh);
+    glViewport(0, 0, fbw, fbh);
 
     glfwSetFramebufferSizeCallback(gWindow.window, sFramebufferSizeCallBack);
     glfwSetKeyCallback(gWindow.window, sKeyCallBack);

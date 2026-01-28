@@ -1,5 +1,6 @@
 #include "../include/shaderplay/shader.h"
 #include "../include/shaderplay/debug.h"
+#include "../include/shaderplay/uniform.h"
 
 static ShaderSource sReadShader(const char *shaderPath)
 {
@@ -74,6 +75,18 @@ ShaderProgram sCreateShaderProgram(const char *vertexSource, const char *fragmen
     return gShader;
 }
 
+void gCacheUniforms(ShaderProgram *s)
+{
+    s->u.gColorLoc = gCreateUniform(s, "gColor");
+    GERR();
+
+    s->u.gResolutionLoc = gCreateUniform(s, "gResolution");
+    GERR();
+
+    s->u.gTimeLoc = gCreateUniform(s, "gTime");
+    GERR();
+}
+
 void sReloadShaderProgram(ShaderProgram *s)
 {
     if (!s || !s->gShaderProgram)
@@ -84,15 +97,16 @@ void sReloadShaderProgram(ShaderProgram *s)
 
     unsigned int oldProgram = s->gShaderProgram;
     ShaderProgram n = sCreateShaderProgram(s->gVertexShaderPath, s->gFragmentShaderPath);
-    
+
     if (!n.gShaderProgram)
     {
         GLOG("error when reloading shader - keeping old program");
         return;
     }
-    
     glDeleteProgram(oldProgram);
     *s = n;
+    gCacheUniforms(s);
+
     printf("shader reload successful!\n");
 }
 
