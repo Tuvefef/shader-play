@@ -11,3 +11,6 @@ src/usp/glad.c
 
 # vscode settings
 .vscode/
+
+# shader demo
+test/

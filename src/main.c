@@ -15,7 +15,7 @@ int main()
     glfwWindowHint(GLFW_OPENGL_PROFILE, GLFW_OPENGL_CORE_PROFILE);
 
     ShaderWindow sw = sCreateWindow(gmVec2(400, 400), "shader play");
-    ShaderProgram sp = sCreateShaderProgram("shaders/core.vert", "shaders/core.frag");
+    ShaderProgram sp = sCreateShaderProgram("shaders/ray.vert", "shaders/ray.frag");
 
     gCacheUniforms(&sp);
 
