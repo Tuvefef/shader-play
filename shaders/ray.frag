@@ -7,153 +7,127 @@ uniform float gTime;
 in vec2 gTexCoord;
 out vec4 FragColor;
 
-#define minx3(x, y, z) min(min(x, y), z)
+#define GTIME() (gTime * 1.2)
 
-struct Light
+struct Ray
 {
-    vec3 lightPosition;
-    vec3 lightDirection;
+    vec3 gRayOrigin;
+    vec3 gRayDirection;
 };
 
-float gRenderSphere(vec3 p, vec3 c, float r)
+float gRenderCube(vec3 gp, vec3 gsize)
 {
-    return length(p - c) - r;
+    return length(max(abs(gp) - gsize, 0.0));
 }
 
-float gRenderFloor(vec3 p, float h)
+vec3 gMatrixRotateX(vec3 gp, float a)
 {
-    return p.y - h;
+    mat3 grot = mat3(
+        vec3(cos(a), -sin(a), 0.0),
+        vec3(sin(a), cos(a), 0.0),
+        vec3(0.0, 0.0, 1.0)
+    );
+
+    return (grot * gp);
 }
 
-float gScene(vec3 p)
+vec3 gMatrixRotateZ(vec3 gp, float a)
 {
-    float sphere0 = gRenderSphere(p, vec3(0.0, 0.0, -2.0), 0.2);
-    float sphere1 = gRenderSphere(p, vec3(1.0, 1.0, -4.0), 0.8);
-    float floorf = gRenderFloor(p, -0.5);
+    mat3 grot = mat3(
+        vec3(cos(a), 0.0, -sin(a)),
+        vec3(0.0, 1.0, 0.0),
+        vec3(sin(a), 0.0, cos(a))
+    );
 
-    return minx3(sphere0, sphere1, floorf);
+    return (grot * gp);
 }
 
-float gRayMarching(vec3 ro, vec3 rd, float start, float end)
+float gRenderCubeRotated(vec3 gp)
 {
-    float depth = start;
+    gp = gMatrixRotateZ(gp, GTIME());
+    gp = gMatrixRotateX(gp, GTIME());
+    return gRenderCube(gp, vec3(0.45));
+}
 
-    for (int i = 0; i < 200; i++)
+float gScene(vec3 gp)
+{
+    return gRenderCubeRotated(gp);
+}
+
+float gRayMarching(vec3 gro, vec3 grd, float start, float end)
+{
+    float gdepth = start;
+    for (int i = 0; i < 255; i++)
     {
-        vec3 p = ro + rd * depth;
-        float d = gScene(p);
+        vec3 gp = gro + gdepth * grd;
+        float gd = gScene(gp);
 
-        if (d < 0.001 || depth > end)
+        gdepth += gd;
+        if (gd < 0.001 || gdepth > end)
             break;
-
-        depth += d;
     }
 
-    return depth;
+    return gdepth;
 }
 
-vec3 gCalculateNormal(vec3 p)
+vec3 gCalculateNormal(vec3 gp)
 {
-    vec2 e = vec2(0.001, 0.0);
-
-    return normalize(vec3(
-        gScene(p + e.xyy) - gScene(p - e.xyy),
-        gScene(p + e.yxy) - gScene(p - e.yxy),
-        gScene(p + e.yyx) - gScene(p - e.yyx)
-    ));
+    float eps = 0.001;
+    float d = gRenderCubeRotated(gp);
+    
+    float dx = gRenderCubeRotated(gp + vec3(eps, 0.0, 0.0)) - d;
+    float dy = gRenderCubeRotated(gp + vec3(0.0, eps, 0.0)) - d;
+    float dz = gRenderCubeRotated(gp + vec3(0.0, 0.0, eps)) - d;
+    
+    return normalize(vec3(dx, dy, dz));
 }
 
-float gSoftShadow(vec3 ro, vec3 rd)
+vec3 gBlinnPhong(vec3 normal, vec3 viewDir, vec3 lightDir, vec3 baseColor)
 {
-    float res = 1.0;
-    float t = 0.02;
-
-    for (int i = 0; i < 64; i++)
-    {
-        float h = gScene(ro + rd * t);
-        res = min(res, 8.0 * h / t);
-        t += clamp(h, 0.02, 0.1);
-        if (h < 0.001) break;
-    }
-
-    return clamp(res, 0.0, 1.0);
-}
-
-float gAO(vec3 p, vec3 n)
-{
-    float ao = 0.0;
-    float sca = 1.0;
-
-    for (int i = 1; i <= 5; i++)
-    {
-        float h = 0.03 * float(i);
-        float d = gScene(p + n * h);
-        ao += (h - d) * sca;
-        sca *= 0.7;
-    }
-
-    return clamp(1.0 - ao, 0.0, 1.0);
-}
-
-float gChecker(vec3 p)
-{
-    vec2 c = floor(p.xz);
-    return mod(c.x + c.y, 2.0);
+    float ambientStrength = 0.2;
+    float diffuseStrength = 0.7;
+    float specularStrength = 0.5;
+    float shininess = 32.0;
+    
+    vec3 ambient = ambientStrength * baseColor;
+    
+    float diff = max(dot(normal, lightDir), 0.0);
+    vec3 diffuse = diffuseStrength * diff * baseColor;
+    
+    vec3 halfVec = normalize(lightDir + viewDir);
+    float spec = pow(max(dot(normal, halfVec), 0.0), shininess);
+    vec3 specular = specularStrength * spec * vec3(1.0);
+    
+    return ambient + diffuse + specular;
 }
 
 void main()
 {
     vec2 uv = (gTexCoord - 0.5) * vec2(gResolution.x / gResolution.y, 1.0);
 
-    vec3 ro = vec3(0.0, 0.0, 1.0);
-    vec3 rd = normalize(vec3(uv, -1.0));
+    Ray r;
+    r.gRayOrigin = vec3(0.0, 0.0, 5.0);
+    r.gRayDirection = normalize(vec3(uv, -1.0));
 
-    vec3 finalColor = vec3(0.0);
-    float d = gRayMarching(ro, rd, 0.1, 100.0);
+    vec3 rayOrigin = r.gRayOrigin;
+    vec3 rayDirection = r.gRayDirection;
 
-    vec3 fogColor = vec3(0.62, 0.79, 0.87);
+    float gd = gRayMarching(rayOrigin, rayDirection, 0.0, 100.0);
 
-    if (d < 100.0)
+    vec3 gFinal = vec3(0.0);
+
+    if (gd > 100.0)
     {
-        vec3 p = ro + rd * d;
-        vec3 n = gCalculateNormal(p);
-
-        Light gl;
-
-        gl.lightPosition = vec3(2.0, 2.0, 4.0);
-        vec3 lightPos = gl.lightPosition;
-
-        gl.lightDirection = normalize(lightPos - p);
-        vec3 lightDir = gl.lightDirection;
-
-        vec3 viewDir  = normalize(ro - p);
-        vec3 halfDir  = normalize(lightDir + viewDir);
-
-        float diff = max(dot(n, lightDir), 0.0);
-        float spec = pow(max(dot(n, halfDir), 0.0), 32.0);
-
-        float shadow = gSoftShadow(p + n * 0.01, lightDir);
-        float ao = gAO(p, n);
-
-        vec3 color = gColor * diff + vec3(1.0) * spec * 0.4;
-        color += vec3(0.15);
-
-        if (abs(gRenderFloor(p, -0.5)) < 0.001)
-        {
-            float c = gChecker(p);
-            color *= mix(0.7, 1.3, c);
-        }
-
-        color *= shadow;
-        color *= ao;
-
-        float fog = exp(-d * 0.04);
-        finalColor = mix(fogColor, color, fog);
-    }
-    else
-    {
-        finalColor = fogColor;
+        gFinal = vec3(0.1);
+    } else {
+        vec3 hitPoint = rayOrigin + gd * rayDirection;
+        vec3 normal = gCalculateNormal(hitPoint);
+        
+        vec3 lightDir = normalize(vec3(2.0, 2.0, 2.0));
+        vec3 viewDir = -rayDirection;
+        
+        gFinal = gBlinnPhong(normal, viewDir, lightDir, gColor);
     }
 
-    FragColor = vec4(finalColor, 1.0);
+    FragColor = vec4(gFinal, 1.0);
 }

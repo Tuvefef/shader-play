@@ -36,7 +36,7 @@ int main()
         glUseProgram(sp.gShaderProgram);
         GERR();
         
-        gUniformVec3(&sp.u.gColorLoc, gmVec3(0.6f, 0.8f, 1.0f));
+        gUniformVec3(&sp.u.gColorLoc, gmVec3(0.65f, 0.51f, 0.74f));
         GERR();
 
         gUniformVec2(&sp.u.gResolutionLoc, gmVec2((float)w, (float)h));
