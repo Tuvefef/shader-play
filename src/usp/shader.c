@@ -85,6 +85,9 @@ void gCacheUniforms(ShaderProgram *s)
 
     s->u.gTimeLoc = gCreateUniform(s, "gTime");
     GERR();
+
+    s->u.gMouse = gCreateUniform(s, "gMouse");
+    GERR();
 }
 
 void sReloadShaderProgram(ShaderProgram *s)

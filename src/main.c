@@ -28,8 +28,15 @@ int main()
     glfwGetFramebufferSize(sw.window, &w, &h);
     glfwSetWindowUserPointer(sw.window, &sp);
 
+    double mx, my;
+
     while (!glfwWindowShouldClose(sw.window))
     {
+        glfwGetCursorPos(sw.window, &mx, &my);
+        
+        float nmx = mx / w;
+        float nmy = 1.0f - (my / h); 
+        
         glClearColor(0.0f, 0.0f, 0.0f, 1.0f);
         glClear(GL_COLOR_BUFFER_BIT);
 
@@ -43,6 +50,9 @@ int main()
         GERR();
 
         gUniformFloat(&sp.u.gTimeLoc, (float)glfwGetTime());
+        GERR();
+
+        gUniformVec2(&sp.u.gMouse, gmVec2(nmx, nmy));
         GERR();
 
         glBindVertexArray(gVertexArrayObject);

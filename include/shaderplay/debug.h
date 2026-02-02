@@ -30,10 +30,11 @@ static inline const char *gErrStr(GLenum err)
     }                                                                                                       \
 } while (0)
 
-#define VALID_GERR(x) do {      \
-    x;                          \
-    GERR();                     \
-} while (0)
+#define VALID_GERR(x)           \
+    do {                        \
+        x;                      \
+        GERR();                 \
+    } while (0)
 
 static inline void gCheckShaderCompile(unsigned int shader, const char *name)
 {

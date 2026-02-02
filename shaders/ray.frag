@@ -3,6 +3,7 @@
 uniform vec2 gResolution;
 uniform vec3 gColor;
 uniform float gTime;
+uniform vec2 gMouse;
 
 in vec2 gTexCoord;
 out vec4 FragColor;
@@ -20,7 +21,7 @@ float gRenderCube(vec3 gp, vec3 gsize)
     return length(max(abs(gp) - gsize, 0.0));
 }
 
-vec3 gMatrixRotateX(vec3 gp, float a)
+vec3 gMatrixRotateZ(vec3 gp, float a)
 {
     mat3 grot = mat3(
         vec3(cos(a), -sin(a), 0.0),
@@ -31,7 +32,7 @@ vec3 gMatrixRotateX(vec3 gp, float a)
     return (grot * gp);
 }
 
-vec3 gMatrixRotateZ(vec3 gp, float a)
+vec3 gMatrixRotateX(vec3 gp, float a)
 {
     mat3 grot = mat3(
         vec3(cos(a), 0.0, -sin(a)),
@@ -46,7 +47,7 @@ float gRenderCubeRotated(vec3 gp)
 {
     gp = gMatrixRotateZ(gp, GTIME());
     gp = gMatrixRotateX(gp, GTIME());
-    return gRenderCube(gp, vec3(0.45));
+    return gRenderCube(gp, vec3(0.2 + gMouse.x));
 }
 
 float gScene(vec3 gp)
