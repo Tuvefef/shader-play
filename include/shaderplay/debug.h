@@ -2,7 +2,11 @@
 #define DEBUG_H
 
 #include <stdio.h>
+#include <stdlib.h>
+
 #include <glad/glad.h>
+
+//#define G_DEBUG
 
 static inline const char *gErrStr(GLenum err)
 {
@@ -23,18 +27,37 @@ static inline const char *gErrStr(GLenum err)
 #define GWARN(fmt, ...)                                 \
     printf("[WARN] " fmt "\n", ##__VA_ARGS__)
 
-#define GERR() do {                                                                                         \
-    GLenum err;                                                                                             \
-    while ((err = glGetError()) != GL_NO_ERROR) {                                                           \
-        fprintf(stderr, "[gl error] %s (0x%x) at %s:%d\n", gErrStr(err), err, __FILE__, __LINE__);          \
-    }                                                                                                       \
-} while (0)
 
-#define VALID_GERR(x)           \
-    do {                        \
-        x;                      \
-        GERR();                 \
-    } while (0)
+#ifdef G_DEBUG
+    #define GERR()                                                                                                  \
+        do {                                                                                                        \
+            GLenum err;                                                                                             \
+            while ((err = glGetError()) != GL_NO_ERROR)                                                             \
+            {                                                                                                       \
+                fprintf(stderr, "[gl error] %s (0x%x) at %s:%d\n", gErrStr(err), err, __FILE__, __LINE__);          \
+            }                                                                                                       \
+        } while (0)
+
+    #define VALID_GERR(x)           \
+        do {                        \
+            x;                      \
+            GERR();                 \
+        } while (0)
+
+    #define GASSERT(c)                                                                          \
+        do {                                                                                    \
+            if (!(c))                                                                           \
+            {                                                                                   \
+                fprintf(stderr, "assert failed: %s\n archive: %s\n line: %d\n function: %s\n",  \
+                    #c, __FILE__, __LINE__, __func__);                                          \
+                abort();                                                                        \
+            }                                                                                   \
+        } while(0)
+#else
+    #define GERR() ((void)0)
+    #define VALID_GERR(x) (x)
+    #define GASSERT(c) ((void)0)
+#endif
 
 static inline void gCheckShaderCompile(unsigned int shader, const char *name)
 {

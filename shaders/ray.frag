@@ -10,16 +10,13 @@ out vec4 FragColor;
 
 #define GTIME() (gTime * 1.2)
 
+#include "util/cube.glsl"
+
 struct Ray
 {
     vec3 gRayOrigin;
     vec3 gRayDirection;
 };
-
-float gRenderCube(vec3 gp, vec3 gsize)
-{
-    return length(max(abs(gp) - gsize, 0.0));
-}
 
 vec3 gMatrixRotateZ(vec3 gp, float a)
 {
@@ -47,7 +44,7 @@ float gRenderCubeRotated(vec3 gp)
 {
     gp = gMatrixRotateZ(gp, GTIME());
     gp = gMatrixRotateX(gp, GTIME());
-    return gRenderCube(gp, vec3(0.2 + gMouse.x));
+    return gRenderCube(gp, gMouse);
 }
 
 float gScene(vec3 gp)

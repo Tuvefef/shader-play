@@ -2,28 +2,106 @@
 #include "../include/shaderplay/debug.h"
 #include "../include/shaderplay/uniform.h"
 
+#include <string.h>
+
+static char *sReadShaderRecursive(const char *shaderPath, size_t *oSize)
+{
+    GASSERT(shaderPath != NULL);
+    FILE *shaderFile = fopen(shaderPath, "rb");
+    if (!shaderFile)
+    {
+        perror("fopen shader");
+        return NULL;
+    }
+
+    char line[1024];
+    size_t capst = 4096;
+    size_t size = 0;
+    char *buff = malloc(capst);
+
+    while (fgets(line, sizeof(line), shaderFile))
+    {
+        if (strncmp(line, "#include", 8) == 0)
+        {
+            char includeP[512];
+
+            if (sscanf(line, "#include \"%[^\"]\"", includeP) == 1)
+            {
+                char dir[512];
+                strcpy(dir, shaderPath);
+
+                char *slash = strrchr(dir, '/');
+                if (slash) *(slash + 1) = '\0';
+                else dir[0] = '\0';
+
+                char fullPath[1024];
+                snprintf(fullPath, sizeof(fullPath), "%s%s", dir, includeP);
+
+                size_t incsize = 0;
+                char *incdata = sReadShaderRecursive(fullPath, &incsize);
+
+                if (incdata)
+                {
+                    if (size + incsize + 1 >= capst)
+                    {
+                        capst = (size + incsize + 1) * 2;
+                        char *tmp = realloc(buff, capst + 1);
+                        if (!tmp) 
+                        {
+                            free(buff);
+                            fclose(shaderFile);
+                            return NULL;
+                        }               
+                        buff = tmp;
+                    }
+
+                    memcpy(buff + size, incdata, incsize);
+                    size += incsize;
+
+                    buff[size++] = '\n';
+
+                    free(incdata);
+                }
+                continue;
+            }
+        }
+
+        size_t len = strlen(line);
+
+        if (size + len >= capst)
+        {
+            capst = (size + len) * 2;
+            buff = realloc(buff, capst);
+        }
+
+        memcpy(buff + size, line, len);
+        size += len;
+    }
+
+    fclose(shaderFile);
+
+    buff[size] = 0;
+
+    if (oSize) *oSize = size;
+
+    return buff;
+    
+}
+
 static ShaderSource sReadShader(const char *shaderPath)
 {
+    GASSERT(shaderPath != NULL);
     ShaderSource src = {
         .shaderPath = shaderPath
     };
 
-    FILE *shaderFile = fopen(src.shaderPath, "rb");
-    if (!shaderFile)
+    src.shaderData = sReadShaderRecursive(shaderPath, &src.shaderSize);
+
+    if (!(src.shaderData))
     {
-        perror("fopen shader");
         return VOIDSTRC(ShaderSource);
     }
 
-    fseek(shaderFile, 0, SEEK_END);
-    src.shaderSize = ftell(shaderFile);
-    rewind(shaderFile);
-
-    src.shaderData = malloc(src.shaderSize + 1);
-    fread(src.shaderData, 1, src.shaderSize, shaderFile);
-    src.shaderData[src.shaderSize] = 0;
-
-    fclose(shaderFile);
     return src;
 }
 
@@ -92,6 +170,7 @@ void gCacheUniforms(ShaderProgram *s)
 
 void sReloadShaderProgram(ShaderProgram *s)
 {
+    GASSERT(s != NULL);
     if (!s || !s->gShaderProgram)
     {
         GLOG("invalid shader program pointer");
