@@ -55,4 +55,4 @@ gUniformFloat(time location, (float)glfwGetTime());
 
 **this test shader is ray marching**
 
-![cube ray marching demo](https://github.com/Tuvefef/shader-play/blob/main/img/raymarchingcube.gif)
+![cube ray marching demo](https://github.com/Tuvefef/shader-play/blob/main/img/ray.gif)
