@@ -17,14 +17,14 @@ With this project you can create or edit your shaders just like in shader toy
 
     `shaders/util/cube.glsl`:
     ```glsl
-        float gRenderCube(vec3 gp, vec2 mouse)
-        {
-            return length(max(abs(gp) - vec3(0.9) + mouse.x, 0.0));
-        }   
+    float gRenderCube(vec3 gp, vec2 mouse)
+    {
+        return length(max(abs(gp) - vec3(0.9) + mouse.x, 0.0));
+    }   
     ````
     `shaders/ray.frag`:
     ```glsl
-        #include "util/cube.glsl"
+    #include "util/cube.glsl"
     ```
 
 ## dependencies
