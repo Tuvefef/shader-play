@@ -1,6 +1,6 @@
 CC := gcc
 BIN := shader
-SRC := src/main.c src/usp/glad.c src/usp/window.c src/usp/shader.c src/usp/uniform.c
+SRC := src/main.c src/usp/glad.c src/usp/window.c src/usp/shader.c src/usp/uniform.c src/usp/buffer.c
 CFLAGS := -I./include -Wall -Wextra
 LDFLAGS := -lGL -lglfw -lm
 

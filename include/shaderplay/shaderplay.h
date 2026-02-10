@@ -5,5 +5,7 @@
 #include "window.h"
 #include "uniform.h"
 #include "shader.h"
+#include "spointer.h"
+#include "buffer.h"
 
 #endif

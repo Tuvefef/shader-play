@@ -15,6 +15,8 @@ typedef struct
     Uniform gResolutionLoc;
     Uniform gTimeLoc;
     Uniform gMouse;
+
+    Uniform gScene;
 } ShaderUniform;
 
 typedef struct ShaderProgram ShaderProgram;

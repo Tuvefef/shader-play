@@ -1,5 +1,5 @@
 #include "../include/shaderplay/uniform.h"
-#include "../include/shaderplay/shader.h"
+#include "../include/shaderplay/spointer.h"
 #include "../include/shaderplay/debug.h"
 #include "../include/shaderplay/window.h"
 
@@ -19,18 +19,19 @@ static void sFramebufferSizeCallBack(GLFWwindow *window, int w, int h)
 
 static void sKeyCallBack(GLFWwindow *window, int k, int s, int a, int m)
 {
-    (void)m;
     (void)s;
+    (void)m;
 
     if (k == GLFW_KEY_R && a == GLFW_PRESS)
     {
-        ShaderProgram *shader = glfwGetWindowUserPointer(window);
-        if (shader)
-        {
-            sReloadShaderProgram(shader);
+        ShaderPointers *shaders = glfwGetWindowUserPointer(window);
+        if(shaders) {
+            sReloadShaderProgram(shaders->mainShader);
+            sReloadShaderProgram(shaders->postShader);
         }
     }
 }
+
 
 ShaderWindow sCreateWindow(vec2 windowSize, const char *windowName)
 {

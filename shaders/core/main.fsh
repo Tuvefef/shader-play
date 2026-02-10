@@ -10,7 +10,7 @@ out vec4 FragColor;
 
 #define GTIME() (gTime * 1.2)
 
-#include "util/cube.glsl"
+#include "../util/cube.glsl"
 
 struct Ray
 {
@@ -124,7 +124,7 @@ void main()
         vec3 lightDir = normalize(vec3(2.0, 2.0, 2.0));
         vec3 viewDir = -rayDirection;
         
-        gFinal = gBlinnPhong(normal, viewDir, lightDir, gColor);
+        gFinal = gBlinnPhong(normal, viewDir, lightDir, vec3(0.47, 0.37, 0.59));
     }
 
     FragColor = vec4(gFinal, 1.0);

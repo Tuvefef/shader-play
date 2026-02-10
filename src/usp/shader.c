@@ -17,7 +17,7 @@ static char *sReadShaderRecursive(const char *shaderPath, size_t *oSize)
     char line[1024];
     size_t capst = 4096;
     size_t size = 0;
-    char *buff = malloc(capst);
+    char *buff = malloc(capst + 1);
 
     while (fgets(line, sizeof(line), shaderFile))
     {
@@ -71,7 +71,14 @@ static char *sReadShaderRecursive(const char *shaderPath, size_t *oSize)
         if (size + len >= capst)
         {
             capst = (size + len) * 2;
-            buff = realloc(buff, capst);
+            char *tmp = realloc(buff, capst);
+            if(!tmp)
+            {
+                free(buff);
+                fclose(shaderFile);
+                return NULL;
+            }
+            buff = tmp;
         }
 
         memcpy(buff + size, line, len);
@@ -166,6 +173,8 @@ void gCacheUniforms(ShaderProgram *s)
 
     s->u.gMouse = gCreateUniform(s, "gMouse");
     GERR();
+
+    s->u.gScene = gCreateUniform(s, "uScene");
 }
 
 void sReloadShaderProgram(ShaderProgram *s)
